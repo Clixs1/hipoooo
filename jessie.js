@@ -33,14 +33,19 @@ class Paper {
         // Touch Events
         paper.addEventListener('touchstart', (e) => {
             const touch = e.touches[0];
-            this.startDrag(touch.clientX, touch.clientY, paper);
-            e.preventDefault();
+            // Check if target is NOT a button or inside a button
+            if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+                this.startDrag(touch.clientX, touch.clientY, paper);
+                e.preventDefault();  // only prevent default if dragging
+            }
         });
 
         document.addEventListener('touchmove', (e) => {
             if (!this.holdingPaper) return;
+
             const touch = e.touches[0];
             this.onDrag(touch.clientX, touch.clientY, paper);
+            e.preventDefault();  // prevent scrolling only if dragging
         });
 
         document.addEventListener('touchend', () => {
@@ -72,7 +77,8 @@ class Paper {
             this.prevMouseX = this.mouseX;
             this.prevMouseY = this.mouseY;
 
-            paper.style.transform = `translate(${this.currentPaperX}px, ${this.currentPaperY}px)`;
+            const originalRotation = paper.dataset.rotation || "0deg";
+            paper.style.transform = `translate(${this.currentPaperX}px, ${this.currentPaperY}px) rotate(${originalRotation})`;
         }
     }
 
